@@ -11,6 +11,8 @@
 .qslidemultiply .qslideviewbox .item{
     padding:20px;
     position: absolute;
+    width: 270px;
+    height: 370px;
 }
 .qslidemultiply .prev{
   width:79px;

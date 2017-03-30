@@ -179,15 +179,16 @@
 				}
 			};
 		  	self.init=function(options){
-		  		//transform:translateX(-100%);
 		  		self.speed=options.speed;
 		  		var qslideviewboxEle=target.find(".qslideviewbox");
 		  		var prevEle=target.find(".prev");
 		  		var nextEle=target.find(".next");
 		  		var items=qslideviewboxEle.find(".item");
 		  		items.css("transform","translateX(-100%)");
-		  		console.log("width",items.eq(0).outerWidth());
+		  		
+		  		console.log("width",items.eq(0).outerWidth());//outerWidth
 		  		console.log("Height",items.eq(0).outerHeight());
+
 		  		qslideviewboxEle.css("width",items.eq(0).outerWidth()*options.pagesize);
 		  		qslideviewboxEle.css("height",items.eq(0).outerHeight());
 		  		var pager=new Pager(items.toArray(),options.pagesize);
@@ -204,6 +205,7 @@
 		  		nextEle.on("click",function(){
 		  			self.turnNext();
 		  		});
+
 		  	};
 
 		}
