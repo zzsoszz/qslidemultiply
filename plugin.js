@@ -50,14 +50,22 @@
 				{
 					self.currentPage--;
 				}
+				// else if(self.currentPage==1){
+				// 	 //如果是最后一页,移动到最后
+				// 	self.currentPage=self.totalPage;
+				// }
 				return self;
 			};
 			self.next=function()
 			{
-				if(self.currentPage<=self.totalPage)
+				if(self.currentPage<self.totalPage)
 				{
 					 self.currentPage++;
 				}
+				// else if(self.currentPage==self.totalPage){
+				// 	 //如果是最后一页,移动到第一页
+				// 	 self.currentPage=1;
+				// }
 				return self;
 			};
 			self.isHead=function()
@@ -178,6 +186,7 @@
 				    self.timeline.play();
 				}
 			};
+			
 		  	self.init=function(options){
 		  		self.speed=options.speed;
 		  		var qslideviewboxEle=target.find(".qslideviewbox");
