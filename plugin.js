@@ -38,22 +38,23 @@
 		    };
 		}
 
-		function Pager(data,pagesize){
+		function Pager(data,pagesize,infinite){
 			var self=this;
 			self.values;
 			self.pagesize;
 			self.pageData=[];
 			self.currentPage;
+			self.infinite=infinite;
 			self.prev=function()
 			{
 				if(self.currentPage>1)
 				{
 					self.currentPage--;
 				}
-				// else if(self.currentPage==1){
-				// 	 //如果是最后一页,移动到最后
-				// 	self.currentPage=self.totalPage;
-				// }
+				else if(self.infinite && self.currentPage==1){
+					 //如果是最后一页,移动到最后
+					self.currentPage=self.totalPage;
+				}
 				return self;
 			};
 			self.next=function()
@@ -62,10 +63,11 @@
 				{
 					 self.currentPage++;
 				}
-				// else if(self.currentPage==self.totalPage){
-				// 	 //如果是最后一页,移动到第一页
-				// 	 self.currentPage=1;
-				// }
+				else if(self.infinite && self.currentPage==self.totalPage)
+				{
+					 //如果是最后一页,移动到第一页
+					 self.currentPage=1;
+				}
 				return self;
 			};
 			self.isHead=function()
@@ -200,7 +202,7 @@
 
 		  		qslideviewboxEle.css("width",items.eq(0).outerWidth()*options.pagesize);
 		  		qslideviewboxEle.css("height",items.eq(0).outerHeight());
-		  		var pager=new Pager(items.toArray(),options.pagesize);
+		  		var pager=new Pager(items.toArray(),options.pagesize,options.infinite);
 		  		console.log(self);
 		  		self.pager=pager;
 		  		var  curPageData=self.pager.getCurrentPageData();
