@@ -188,7 +188,6 @@
 			};
 			self.stopAutorun=function()
 			{
-				console.log(self.autorunFn);
 				window.clearInterval(self.autorunFn);
 			};
 			self.turnNext=function(){
@@ -238,18 +237,16 @@
 		  			self.turnNext();
 		  			self.freshUI();
 		  		});
-		  		target.on("mouseenter",function(){
-		  			self.stopAutorun();
-		  		});
-		  		target.on("mouseleave",function(){
-		  			self.startAutorun();
-		  		});
-		  		self.startAutorun();
-		  		// 		self.timeline.addCallback(function(){
-				//     	self.freshUI();
-				// },"+2");
-
-
+		  		if(self.autorun)
+		  		{
+		  			target.on("mouseenter",function(){
+			  			self.stopAutorun();
+			  		});
+			  		target.on("mouseleave",function(){
+			  			self.startAutorun();
+			  		});
+			  		self.startAutorun();
+		  		}
 		  	};
 
 		}
