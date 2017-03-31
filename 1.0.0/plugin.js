@@ -135,6 +135,7 @@
 			self.speed=1;
 			self.pager;
 			self.infinite;
+			self.autorunFn;
 			self.timeline = new TimelineMax({paused:true});
 			self.freshUI=function(){
 				if(!self.infinite)
@@ -177,13 +178,24 @@
 				    self.timeline.play();
 				}
 			};
+			self.startAutorun=function()
+			{
+				window.clearInterval(self.autorunFn);
+				self.autorunFn=setInterval(function(){
+		  			self.turnNext();
+		  			self.freshUI();
+		  		},1000);
+			};
+			self.stopAutorun=function()
+			{
+				console.log(self.autorunFn);
+				window.clearInterval(self.autorunFn);
+			};
 			self.turnNext=function(){
 				if(!self.timeline.isActive()){
 					self.timeline.kill().clear();
 				    var  curPageData=self.pager.getCurrentPageData();
-				    console.log(self.pager.currentPage);
 				    var  nextPageData=self.pager.next().getCurrentPageData();
-				    console.log(self.pager.currentPage);
 				    for(var i=0;i<curPageData.length;i++){
 				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
 					            x: "-100%"
@@ -206,16 +218,12 @@
 		  		self.prevEle=target.find(".prev");
 		  		self.nextEle=target.find(".next");
 		  		self.infinite=options.infinite;
+		  		self.autorun=options.autorun;
 		  		var items=qslideviewboxEle.find(".item");
 		  		items.css("transform","translateX(-100%)");
-		  		
-		  		console.log("width",items.eq(0).outerWidth());//outerWidth
-		  		console.log("Height",items.eq(0).outerHeight());
-
 		  		qslideviewboxEle.css("width",items.eq(0).outerWidth()*options.pagesize);
 		  		qslideviewboxEle.css("height",items.eq(0).outerHeight());
 		  		var pager=new Pager(items.toArray(),options.pagesize,options.infinite);
-		  		console.log(self);
 		  		self.pager=pager;
 		  		var  curPageData=self.pager.getCurrentPageData();
 		  		for(var i=0;i<curPageData.length;i++)
@@ -230,7 +238,13 @@
 		  			self.turnNext();
 		  			self.freshUI();
 		  		});
-
+		  		target.on("mouseenter",function(){
+		  			self.stopAutorun();
+		  		});
+		  		target.on("mouseleave",function(){
+		  			self.startAutorun();
+		  		});
+		  		self.startAutorun();
 		  		// 		self.timeline.addCallback(function(){
 				//     	self.freshUI();
 				// },"+2");
