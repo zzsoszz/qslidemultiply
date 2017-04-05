@@ -234,6 +234,8 @@
 		  		self.compoentHeight=compoentHeight;
 		  		qslideviewboxEle.css("width",compoentWidth);
 		  		qslideviewboxEle.css("height",compoentHeight);
+		  		target.css("width",compoentWidth);
+		  		target.css("height",compoentHeight);
 		  		var pager=new Pager(items.toArray(),options.pagesize,options.infinite);
 		  		self.pager=pager;
 		  		var  curPageData=self.pager.getCurrentPageData();
