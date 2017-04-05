@@ -222,6 +222,8 @@
 		  		items.css("transform","translateX(-100%)");
 		  		qslideviewboxEle.css("width",items.eq(0).outerWidth()*options.pagesize);
 		  		qslideviewboxEle.css("height",items.eq(0).outerHeight());
+		  		target.css("width",items.eq(0).outerWidth()*options.pagesize);
+		  		target.css("height",items.eq(0).outerHeight());
 		  		var pager=new Pager(items.toArray(),options.pagesize,options.infinite);
 		  		self.pager=pager;
 		  		var  curPageData=self.pager.getCurrentPageData();
