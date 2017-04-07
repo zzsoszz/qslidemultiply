@@ -268,7 +268,7 @@
 				self.scaleX=1;
 				self.scaleY=1;
 				self.scale=1;
-
+				
 		  		$(window).resize(_.debounce(function () {
 		  		  	scaleComponent(target,$(window).width(),$(window).height());
 				}, 150));
@@ -282,7 +282,6 @@
 				    self.scaleY = scaleY;
 				    self.scale = scaleX;//(scaleX > scaleY) ? scaleY : scaleX;
 				    ele.attr('style', '-webkit-transform:scale(' + self.scale*detectZoom() + ')');
-
 				    console.log(detectZoom())
 				}
 				

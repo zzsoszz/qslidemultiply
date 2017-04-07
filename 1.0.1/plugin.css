@@ -1,8 +1,6 @@
 .qslidemultiply {
 	  margin:auto;
     position: relative;
-    width:fit-content;
-    position: relative;
 }
 .qslidemultiply .qslideviewbox{
     overflow: hidden;
