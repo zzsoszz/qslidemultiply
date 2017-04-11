@@ -1,0 +1,307 @@
+(function($,sr){
+
+  // debouncing function from John Hann
+  // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+  var debounce = function (func, threshold, execAsap) {
+      var timeout;
+      return function debounced () {
+          var obj = this, args = arguments;
+          function delayed () {
+              if (!execAsap)
+                  func.apply(obj, args);
+              timeout = null;
+          };
+          if (timeout)
+              clearTimeout(timeout);
+          else if (execAsap)
+              func.apply(obj, args);
+          timeout = setTimeout(delayed, threshold || 100);
+      };
+  }
+  // smartresize 
+  jQuery.fn[sr] = function(fn){  return fn ? this.bind('resize', debounce(fn) ) : this.trigger(sr); };
+
+})(jQuery,'smartresize');
+
+
+(function($){
+
+		 var defaultoptions={};
+		 var plugname = "qslidemultiply";
+		 $.fn[plugname] = function() {
+		    var isMethodCall = arguments.length > 0 && typeof arguments[0] === "string";
+		    if (isMethodCall) {
+
+		      var methodname = arguments[0];
+		      var args = Array.prototype.slice.call(arguments, 1);
+		      this.each(function() {
+		        var instance = $.data(this, plugname);
+		        if (instance && $.isFunction(instance[methodname])) {
+		          var method = instance[methodname];
+		          method.apply(instance, args);
+		        }
+		      });
+		    } else {
+		      var inputoptions = arguments;
+		      $(this).each(
+		        function() {
+		          var optionsnew = $.extend({}, defaultoptions);
+		          if (inputoptions.length > 0) {
+		            optionsnew = $.extend(optionsnew, inputoptions[0]);
+		          }
+		          var instance = $(this).data(plugname);
+		          if (instance) {
+		            instance.init(optionsnew);
+		          } else {
+		            var target = $(this);
+		            instance = new PluginObject(target);
+		            instance.init(optionsnew);
+		            $(this).data(plugname, instance);
+		          }
+		        }
+		      );
+		      return this;
+		    };
+		}
+
+		function Pager(data,pagesize,infinite){
+			var self=this;
+			self.values;
+			self.pagesize;
+			self.pageData=[];
+			self.currentPage;
+			self.infinite=infinite;
+			self.prev=function()
+			{
+				if(self.currentPage>1)
+				{
+					self.currentPage--;
+				}
+				else if(self.infinite && self.currentPage==1){
+					 //如果是最后一页,移动到最后
+					self.currentPage=self.totalPage;
+				}
+				return self;
+			};
+			self.next=function()
+			{
+				if(self.currentPage<self.totalPage)
+				{
+					 self.currentPage++;
+				}
+				else if(self.infinite && self.currentPage==self.totalPage)
+				{
+					 //如果是最后一页,移动到第一页
+					 self.currentPage=1;
+				}
+				return self;
+			};
+			self.isHead=function()
+			{
+				return self.currentPage==1;
+			};
+			self.goHead=function()
+			{
+				if(self.havePage())
+				{
+					self.currentPage=1;
+				}
+			};
+			self.goEnd=function()
+			{
+				if(self.havePage())
+				{
+					self.currentPage=self.totalPage;
+				}
+			};
+			self.isEnd=function()
+			{
+				return self.currentPage==self.totalPage;
+			};
+			self.getCurrentPageData=function()
+			{
+				return self.pageData[self.currentPage-1]||[];
+			};
+			self.havePage=function(){
+				return self.totalPage>0;
+			};
+			self.go=function(page){
+				if(self.havePage())
+				{
+					if(page<1)
+					{
+						self.goHead();
+					}else if(page>self.totalPage){
+						self.goEnd();
+					}
+					self.currentPage=page;
+				}
+				return self;
+			};
+			self.init=function(data,pagesize){
+				self.pagesize=pagesize;
+				self.data=data;
+				self.pageData=_.chunk(self.data,self.pagesize);
+		  		self.totalPage=self.pageData.length;
+		  		self.currentPage=self.havePage()?1:0;
+			};
+			self.init(data,pagesize);
+		};
+		
+		function PluginObject(target) {
+			var self=this;
+			self.imgEles;
+			self.default="images/none.png";
+			self.nextEle;
+			self.prevEle;
+			self.speed=1;
+			self.pager;
+			self.infinite;
+			self.autorunFn;
+			self.qslideviewboxEle;
+			self.items;
+			self.options;
+			self.timeline = new TimelineMax({paused:true});
+			self.freshUI=function(){
+				if(!self.infinite)
+				{
+					if(self.pager.isHead())
+					{
+						self.prevEle.addClass("disable");
+					}else{
+						self.prevEle.removeClass("disable");
+					}
+					if(self.pager.isEnd()){
+						self.nextEle.addClass("disable");
+					}else{
+						self.nextEle.removeClass("disable");
+					}
+				}
+			};
+			self.turnPrev=function(){
+				if(!self.timeline.isActive()){
+					self.timeline.kill().clear();
+					//当前页面的往右移动
+				    var  curPageData=self.pager.getCurrentPageData();
+
+				    var  prevPageData=self.pager.prev().getCurrentPageData();
+				    
+				    for(var i=0;i<curPageData.length;i++){
+				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
+					            x:self.pager.pagesize+"00%"
+					    }), "0");
+				    };
+				    //前一页的移动到可视区域
+				    for(var i=0;i<prevPageData.length;i++){
+				    	TweenLite.set(prevPageData[i],{
+					            x:"-100%"
+					    });
+				    	self.timeline.add(TweenLite.to(prevPageData[i],self.speed, {
+					            x:i+"00%"
+					    }), "0");
+				    };
+				    self.timeline.play();
+				}
+			};
+			self.startAutorun=function()
+			{
+				window.clearInterval(self.autorunFn);
+				self.autorunFn=setInterval(function(){
+		  			self.turnNext();
+		  			self.freshUI();
+		  		},1000);
+			};
+			self.stopAutorun=function()
+			{
+				window.clearInterval(self.autorunFn);
+			};
+			self.turnNext=function(){
+				if(!self.timeline.isActive()){
+					self.timeline.kill().clear();
+				    var  curPageData=self.pager.getCurrentPageData();
+				    var  nextPageData=self.pager.next().getCurrentPageData();
+				    for(var i=0;i<curPageData.length;i++){
+				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
+					            x: "-100%"
+					    }), "0");
+				    };
+				    for(var i=0;i<nextPageData.length;i++){
+				    	TweenLite.set(nextPageData[i],{
+					            x:self.pager.pagesize+"00%"
+					    });
+				    	self.timeline.add(TweenLite.to(nextPageData[i],self.speed, {
+					            x:i+"00%"
+					    }), "0");
+				    };
+				    self.timeline.play();
+				}
+			};
+			self.resizeComponent=function(windowWidth)
+			{
+				console.log(windowWidth);
+				if(windowWidth  <= 600){
+					self.options.pagesize=1;
+					self.prevEle.hide();
+					self.nextEle.hide();
+				}else if(windowWidth > 600 && windowWidth <= 900 ){
+					self.prevEle.hide();
+					self.nextEle.hide();
+					self.options.pagesize=2;
+				}else if(windowWidth > 900 && windowWidth <= 1200 ){
+					self.prevEle.show();
+					self.nextEle.show();
+					self.options.pagesize=3;
+				}else if(windowWidth > 1200){
+					self.prevEle.show();
+					self.nextEle.show();
+					self.options.pagesize=4;
+				}
+				var pager=new Pager(self.items.toArray(),self.options.pagesize,self.options.infinite);
+		  		self.pager=pager;
+		  		var  curPageData=self.pager.getCurrentPageData();
+		  		for(var i=0;i<curPageData.length;i++)
+		  		{
+		  			$(curPageData[i]).css("transform","translateX("+(i*100)+"%)");
+		  		};
+				self.qslideviewboxEle.css("width",self.items.eq(0).outerWidth()*self.options.pagesize);
+		  		self.qslideviewboxEle.css("height",self.items.eq(0).outerHeight());
+		  		target.css("width",self.items.eq(0).outerWidth()*self.options.pagesize);
+		  		target.css("height",self.items.eq(0).outerHeight());
+			};
+		  	self.init=function(options){
+
+		  		self.options=options;
+		  		self.speed=self.options.speed;
+		  		self.qslideviewboxEle=target.find(".qslideviewbox");
+		  		self.prevEle=target.find(".prev");
+		  		self.nextEle=target.find(".next");
+		  		self.items=self.qslideviewboxEle.find(".item");
+		  		self.items.css("transform","translateX(-100%)");
+		  		
+		  		self.prevEle.on("click",function(){
+		  			self.turnPrev();
+		  			self.freshUI();
+		  		});
+		  		self.nextEle.on("click",function(){
+		  			self.turnNext();
+		  			self.freshUI();
+		  		});
+		  		if(self.options.autorun)
+		  		{
+		  			target.on("mouseenter",function(){
+			  			self.stopAutorun();
+			  		});
+			  		target.on("mouseleave",function(){
+			  			self.startAutorun();
+			  		});
+			  		self.startAutorun();
+		  		};
+		  		$(window).smartresize(function(){
+		  			self.resizeComponent($(window).width());
+				});
+		  		$(window).trigger("resize");
+
+		  	};
+
+		}
+})(jQuery);
