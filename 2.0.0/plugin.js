@@ -136,6 +136,9 @@
 			self.pager;
 			self.infinite;
 			self.autorunFn;
+			self.qslideviewboxEle;
+			self.items;
+			self.options;
 			self.timeline = new TimelineMax({paused:true});
 			self.freshUI=function(){
 				if(!self.infinite)
@@ -211,26 +214,39 @@
 				    self.timeline.play();
 				}
 			};
-		  	self.init=function(options){
-		  		self.speed=options.speed;
-		  		var qslideviewboxEle=target.find(".qslideviewbox");
-		  		self.prevEle=target.find(".prev");
-		  		self.nextEle=target.find(".next");
-		  		self.infinite=options.infinite;
-		  		self.autorun=options.autorun;
-		  		var items=qslideviewboxEle.find(".item");
-		  		items.css("transform","translateX(-100%)");
-		  		qslideviewboxEle.css("width",items.eq(0).outerWidth()*options.pagesize);
-		  		qslideviewboxEle.css("height",items.eq(0).outerHeight());
-		  		target.css("width",items.eq(0).outerWidth()*options.pagesize);
-		  		target.css("height",items.eq(0).outerHeight());
-		  		var pager=new Pager(items.toArray(),options.pagesize,options.infinite);
+			self.resizeComponent=function(windowWidth)
+			{
+				console.log(windowWidth);
+				if(windowWidth  <= 600){
+					self.options.pagesize=1;
+				}else if(windowWidth > 600 && windowWidth <= 900 ){
+					self.options.pagesize=2;
+				}else if(windowWidth > 900 && windowWidth <= 1200 ){
+					self.options.pagesize=3;
+				}else if(windowWidth > 1200){
+					self.options.pagesize=4;
+				}
+				var pager=new Pager(self.items.toArray(),self.options.pagesize,self.options.infinite);
 		  		self.pager=pager;
 		  		var  curPageData=self.pager.getCurrentPageData();
 		  		for(var i=0;i<curPageData.length;i++)
 		  		{
 		  			$(curPageData[i]).css("transform","translateX("+(i*100)+"%)");
 		  		};
+				self.qslideviewboxEle.css("width",self.items.eq(0).outerWidth()*self.options.pagesize);
+		  		self.qslideviewboxEle.css("height",self.items.eq(0).outerHeight());
+		  		target.css("width",self.items.eq(0).outerWidth()*self.options.pagesize);
+		  		target.css("height",self.items.eq(0).outerHeight());
+			};
+		  	self.init=function(options){
+		  		self.options=options;
+		  		self.speed=self.options.speed;
+		  		self.qslideviewboxEle=target.find(".qslideviewbox");
+		  		self.prevEle=target.find(".prev");
+		  		self.nextEle=target.find(".next");
+		  		self.items=self.qslideviewboxEle.find(".item");
+		  		self.items.css("transform","translateX(-100%)");
+		  		
 		  		self.prevEle.on("click",function(){
 		  			self.turnPrev();
 		  			self.freshUI();
@@ -239,7 +255,7 @@
 		  			self.turnNext();
 		  			self.freshUI();
 		  		});
-		  		if(self.autorun)
+		  		if(self.options.autorun)
 		  		{
 		  			target.on("mouseenter",function(){
 			  			self.stopAutorun();
@@ -248,7 +264,12 @@
 			  			self.startAutorun();
 			  		});
 			  		self.startAutorun();
-		  		}
+		  		};
+		  		$(window).on("resize",function(){
+		  			self.resizeComponent($(window).width());
+		  		});
+		  		$(window).trigger("resize");
+
 		  	};
 
 		}
