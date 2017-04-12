@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>bossapp</title>
+	<meta name=viewport content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="plugin.css">
+	<script type="text/javascript" src="js/EQCSS.min.js"></script>
+	<script type="text/javascript" src="js/EQCSS-polyfills.min.js"></script>
+
+	<script type="text/javascript" src="js/TweenMax.js"></script>
+	<script type="text/javascript" src="js/TimelineMax.js"></script>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/lodash.min.js"></script>
+	<script type="text/javascript" src="js/enquire.min.js"></script>
+	<script type="text/javascript" src="qevent.js"></script>
+
+	<script type="text/javascript" src="plugin.js"></script>
+
+	<!--
+		https://github.com/benmajor/jQuery-Touch-Events/blob/master/src/jquery.mobile-events.js
+	-->
+	
+</head>
+<body>
+
+	<div id="test" style="background:#282828;margin-top:200px;padding:50px;">
+		<h1 style="color:#fff;text-align: center;">导师介绍</h1>
+		<div>
+			<div class="qslidemultiply">
+				<div class="qslideviewbox">
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar2.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar2.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar2.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar2.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar2.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar2.png"  >
+					</div>
+					<div class="item" style="display:block;">
+						<img src="images/teacheravatar2.png"  >
+					</div>
+				</div>
+				<div class="next">
+				</div>
+				<div class="prev">
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+
+<!-- BEGIN PAGE LEVEL SCRIPTS -->
+<script>
+jQuery(window).ready(function() {
+
+	$(".qslidemultiply").qslidemultiply({
+		pagesize:4,
+		speed:0.5,
+		//infinite:true,
+		//autorun:true
+	});
+	
+	// $(".qslidemultiply").on("swipe",function(data){
+	// 	console.log("direct:",data);
+	// });
+	$(".qslidemultiply").on("swiperight",function(e){
+		console.log("direct:",e);
+	});
+	$(".qslidemultiply").on("swipeleft",function(e){
+		console.log("direct:",e);
+	});
+	// $('.qslidemultiply').on('tripleclick', function(){
+ //   		alert( 'I have been triple-clicked!' );
+ //    });
+
+});
+</script>
+<!-- END PAGE LEVEL SCRIPTS -->
+
+
+
+</html>
