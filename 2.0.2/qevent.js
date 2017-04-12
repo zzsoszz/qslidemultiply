@@ -58,7 +58,6 @@
 			    finalCoord.x = (e.originalEvent.targetTouches) ? e.originalEvent.targetTouches[0].pageX : e.pageX;
 				finalCoord.y = (e.originalEvent.targetTouches) ? e.originalEvent.targetTouches[0].pageY : e.pageY;
 			    var direction = GetSlideDirection(originalCoord.x, originalCoord.y, finalCoord.x, finalCoord.y);
-			    console.log(direction);
 			    switch (direction) {
 				        case 0:
 				            //alert("没滑动");
