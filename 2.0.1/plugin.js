@@ -269,7 +269,7 @@
 		  		target.css("height",self.items.eq(0).outerHeight());
 			};
 		  	self.init=function(options){
-
+		  		
 		  		self.options=options;
 		  		self.speed=self.options.speed;
 		  		self.qslideviewboxEle=target.find(".qslideviewbox");
