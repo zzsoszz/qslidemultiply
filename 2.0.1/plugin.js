@@ -66,11 +66,12 @@
 
 		function Pager(data,pagesize,infinite){
 			var self=this;
-			self.values;
-			self.pagesize;
+			self.data;/*原始未分页数据*/
+			self.pagesize;/*每一页元素个数*/
 			self.pageData=[];
-			self.currentPage;
-			self.infinite=infinite;
+			self.currentPage;/*是否当前页*/
+			self.totalPage;/*总页数*/
+			self.infinite=infinite;/*是否无线循环*/
 			self.prev=function()
 			{
 				if(self.currentPage>1)
@@ -138,16 +139,23 @@
 				}
 				return self;
 			};
+			self.setPageSize=function(pagesize)
+			{
+				self.init(self.data,pagesize);
+			};
+			self.getPageSize=function()
+			{
+				return self.pagesize;
+			};
 			self.init=function(data,pagesize){
 				self.pagesize=pagesize;
 				self.data=data;
-				self.pageData=_.chunk(self.data,self.pagesize);
+				self.pageData=_.chunk(self.data,self.pagesize);//分页后的数据，每个子数组一页
 		  		self.totalPage=self.pageData.length;
 		  		self.currentPage=self.havePage()?1:0;
 			};
 			self.init(data,pagesize);
 		};
-		
 		function PluginObject(target) {
 			var self=this;
 			self.imgEles;
@@ -161,23 +169,9 @@
 			self.qslideviewboxEle;
 			self.items;
 			self.options;
+			self.viewport;
 			self.timeline = new TimelineMax({paused:true});
-			self.freshUI=function(){
-				if(!self.infinite)
-				{
-					if(self.pager.isHead())
-					{
-						self.prevEle.addClass("disable");
-					}else{
-						self.prevEle.removeClass("disable");
-					}
-					if(self.pager.isEnd()){
-						self.nextEle.addClass("disable");
-					}else{
-						self.nextEle.removeClass("disable");
-					}
-				}
-			};
+
 			self.turnPrev=function(){
 				if(!self.timeline.isActive()){
 					self.timeline.kill().clear();
@@ -201,6 +195,7 @@
 					    }), "0");
 				    };
 				    self.timeline.play();
+				    self.freshPager();
 				}
 			};
 			self.startAutorun=function()
@@ -208,7 +203,6 @@
 				window.clearInterval(self.autorunFn);
 				self.autorunFn=setInterval(function(){
 		  			self.turnNext();
-		  			self.freshUI();
 		  		},1000);
 			};
 			self.stopAutorun=function()
@@ -234,40 +228,72 @@
 					    }), "0");
 				    };
 				    self.timeline.play();
+		  			self.freshPager();
 				}
 			};
-			self.resizeComponent=function(windowWidth)
+			self.resizeComponent=function()
 			{
-				console.log(windowWidth);
-				if(windowWidth  <= 600){
-					self.options.pagesize=1;
-					self.prevEle.hide();
-					self.nextEle.hide();
-				}else if(windowWidth > 600 && windowWidth <= 900 ){
-					self.prevEle.hide();
-					self.nextEle.hide();
-					self.options.pagesize=2;
-				}else if(windowWidth > 900 && windowWidth <= 1200 ){
-					self.prevEle.show();
-					self.nextEle.show();
-					self.options.pagesize=3;
-				}else if(windowWidth > 1200){
-					self.prevEle.show();
-					self.nextEle.show();
-					self.options.pagesize=4;
+				self.viewport={
+					width:$(window).width(),
+					height:$(window).height()
+				};
+				console.log(self.viewport);
+				self.renderALL();
+			};
+			self.renderALL=function()
+			{
+				self.renderPager();
+				self.renderContainer();
+			};
+			self.freshPager=function(){
+				if(self.viewport.width < 900)
+				{
+					self.prevEle.addClass("disable");
+					self.nextEle.addClass("disable");
+					return;
 				}
-				var pager=new Pager(self.items.toArray(),self.options.pagesize,self.options.infinite);
-		  		self.pager=pager;
+				if(!self.infinite)
+				{
+					if(self.pager.isHead())
+					{
+						self.prevEle.addClass("disable");
+					}else{
+						self.prevEle.removeClass("disable");
+					}
+					if(self.pager.isEnd()){
+						self.nextEle.addClass("disable");
+					}else{
+						self.nextEle.removeClass("disable");
+					}
+				}
+			};
+			self.renderPager=function()
+			{
+				if(self.viewport.width  <= 600){
+					self.pager.setPageSize(1);
+				}else if(self.viewport.width > 600 && self.viewport.width <= 900 ){
+					self.pager.setPageSize(2);
+				}else if(self.viewport.width > 900 && self.viewport.width <= 1200 ){
+					self.pager.setPageSize(3);
+				}else if(self.viewport.width > 1200){
+					self.pager.setPageSize(4);
+				}
 		  		var  curPageData=self.pager.getCurrentPageData();
 		  		for(var i=0;i<curPageData.length;i++)
 		  		{
 		  			$(curPageData[i]).css("transform","translateX("+(i*100)+"%)");
 		  		};
-				self.qslideviewboxEle.css("width",self.items.eq(0).outerWidth()*self.options.pagesize);
+		  		self.freshPager();
+			};
+
+			self.renderContainer=function()
+			{
+				self.qslideviewboxEle.css("width",self.items.eq(0).outerWidth()*self.pager.getPageSize());
 		  		self.qslideviewboxEle.css("height",self.items.eq(0).outerHeight());
-		  		target.css("width",self.items.eq(0).outerWidth()*self.options.pagesize);
+		  		target.css("width",self.items.eq(0).outerWidth()*self.pager.getPageSize());
 		  		target.css("height",self.items.eq(0).outerHeight());
 			};
+
 		  	self.init=function(options){
 		  		
 		  		self.options=options;
@@ -278,13 +304,14 @@
 		  		self.items=self.qslideviewboxEle.find(".item");
 		  		self.items.css("transform","translateX(-100%)");
 		  		
+		  		var pager=new Pager(self.items.toArray(),self.options.pagesize,self.options.infinite);
+		  		self.pager=pager;
+
 		  		self.prevEle.on("click",function(){
 		  			self.turnPrev();
-		  			self.freshUI();
 		  		});
 		  		self.nextEle.on("click",function(){
 		  			self.turnNext();
-		  			self.freshUI();
 		  		});
 		  		if(self.options.autorun)
 		  		{
@@ -297,7 +324,7 @@
 			  		self.startAutorun();
 		  		};
 		  		$(window).smartresize(function(){
-		  			self.resizeComponent($(window).width());
+		  			self.resizeComponent();
 				});
 		  		$(window).trigger("resize");
 
