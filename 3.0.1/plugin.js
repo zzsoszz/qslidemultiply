@@ -159,6 +159,8 @@
 			};
 			self.init(data,pagesize);
 		};
+
+		
 		function PluginObject(target) {
 			var self=this;
 			self.imgEles;
@@ -183,8 +185,8 @@
 					var  prevPageIndex=self.pager.getCurrentPage();
 				    var  nextPageData=self.pager.go(pageIndex).getCurrentPageData();
 				    var  nextPageIndex=self.pager.getCurrentPage();
-				     console.log(prevPageIndex,nextPageIndex);
-			    	 self.transition("left",curPageData,nextPageData,prevPageIndex,nextPageIndex);
+				    console.log(prevPageIndex,nextPageIndex);
+			    	self.transition("left",curPageData,nextPageData,prevPageIndex,nextPageIndex);
 			    }
 		    };
 		    self.turnNext=function(){
@@ -213,12 +215,13 @@
 		    	console.log(direction);
 		    	if(direction=="left")
 		    	{
+		    		//当前页移到最后面隐藏起来
 					for(var i=0;i<curPageData.length;i++){
 				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
 					            x:self.pager.pagesize+"00%"
 					    }), "0");
 				    };
-				    //前一页的移动到可视区域
+				    //下一页的移动到可视区域
 				    for(var i=0;i<nextPageData.length;i++){
 				    	TweenLite.set(nextPageData[i],{
 					            x:"-100%"
@@ -228,11 +231,13 @@
 					    }), "0");
 				    };
 		    	}else if(direction=="right"){
+		    		//当前页移到最前面隐藏起来
 					for(var i=0;i<curPageData.length;i++){
 				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
 					            x: "-100%"
 					    }), "0");
 				    };
+				    //下一页的移动到可视区域
 				    for(var i=0;i<nextPageData.length;i++){
 				    	TweenLite.set(nextPageData[i],{
 					            x:self.pager.pagesize+"00%"
