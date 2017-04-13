@@ -312,8 +312,12 @@
 				console.log(self.viewport);
 				self.renderALL();
 			};
+			self.resetData=function(){
+				self.items.css("transform","translateX(-100%)");
+			};
 			self.renderALL=function()
 			{
+				self.resetData();
 				self.renderPager();
 				self.renderChildren();
 			};
@@ -388,7 +392,6 @@
 		  			self.dots=self.dotslistEle.find(".dot");
 		  		});
 		  		self.pager.emit('totalPageChange',self.options.pagesize);
-		  		
 		  		self.prevEle.on("click",function(){
 		  			self.turnPrev();
 		  		});
