@@ -237,7 +237,6 @@
 					width:$(window).width(),
 					height:$(window).height()
 				};
-				console.log(self.viewport);
 				self.renderALL();
 			};
 			self.renderALL=function()

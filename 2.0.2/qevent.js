@@ -1,3 +1,7 @@
+/*
+	https://learn.jquery.com/events/event-extensions/
+	http://benalman.com/news/2010/03/jquery-special-events/#api-setup
+*/
  (function($){
 	function GetSlideAngle(dx, dy) {
 	    return Math.atan2(dy, dx) * 180 / Math.PI;
@@ -114,7 +118,6 @@
 
 
 
-//http://benalman.com/news/2010/03/jquery-special-events/#api-setup
 
 (function($){
 
