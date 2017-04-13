@@ -263,7 +263,8 @@
 					            x:i+"00%"
 					    }), "0");
 				    };
-		    	}else if(direction=="right"){
+		    	}
+		    	else if(direction=="right"){
 		    		//当前页移到最前面隐藏起来
 					for(var i=0;i<curPageData.length;i++){
 				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
@@ -396,6 +397,7 @@
 		  			self.resizeComponent();
 				});
 		  		$(window).trigger("resize");
+
 
 		  	};
 

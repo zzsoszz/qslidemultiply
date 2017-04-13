@@ -23,6 +23,31 @@
 
 })(jQuery,'smartresize');
 
+(function(jQuery) {
+  jQuery.eventEmitter = {
+    _JQInit: function() {
+      this._JQ = jQuery(this);
+    },
+    emit: function(evt, data) {
+      !this._JQ && this._JQInit();
+      this._JQ.trigger(evt, data);
+    },
+    once: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.one(evt, handler);
+    },
+    on: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.bind(evt, handler);
+    },
+    off: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.unbind(evt, handler);
+    }
+  };
+}(jQuery));
+
+
 
 (function($){
 
@@ -77,10 +102,12 @@
 				if(self.currentPage>1)
 				{
 					self.currentPage--;
+					self.emit('pageChange',self.currentPage);
 				}
 				else if(self.infinite && self.currentPage==1){
 					 //如果是最后一页,移动到最后
 					self.currentPage=self.totalPage;
+					self.emit('pageChange',self.currentPage);
 				}
 				return self;
 			};
@@ -89,11 +116,13 @@
 				if(self.currentPage<self.totalPage)
 				{
 					 self.currentPage++;
+					 self.emit('pageChange',self.currentPage);
 				}
 				else if(self.infinite && self.currentPage==self.totalPage)
 				{
 					 //如果是最后一页,移动到第一页
 					 self.currentPage=1;
+					 self.emit('pageChange',self.currentPage);
 				}
 				return self;
 			};
@@ -106,6 +135,7 @@
 				if(self.havePage())
 				{
 					self.currentPage=1;
+					self.emit('pageChange',self.currentPage);
 				}
 			};
 			self.goEnd=function()
@@ -113,6 +143,7 @@
 				if(self.havePage())
 				{
 					self.currentPage=self.totalPage;
+					self.emit('pageChange',self.currentPage);
 				}
 			};
 			self.isEnd=function()
@@ -122,6 +153,9 @@
 			self.getCurrentPageData=function()
 			{
 				return self.pageData[self.currentPage-1]||[];
+			};
+			self.getCurrentPage=function(){
+				return self.currentPage;
 			};
 			self.havePage=function(){
 				return self.totalPage>0;
@@ -137,11 +171,13 @@
 					}
 					self.currentPage=page;
 				}
+				self.emit('pageChange',self.currentPage);
 				return self;
 			};
 			self.setPageSize=function(pagesize)
 			{
 				self.init(self.data,pagesize);
+				self.emit('totalPageChange',self.totalPage);
 			};
 			self.getPageSize=function()
 			{
@@ -156,6 +192,9 @@
 			};
 			self.init(data,pagesize);
 		};
+
+		$.extend(Pager.prototype, $.eventEmitter);
+
 		function PluginObject(target) {
 			var self=this;
 			self.imgEles;
@@ -170,34 +209,89 @@
 			self.items;
 			self.options;
 			self.viewport;
+			self.dots;
 			self.timeline = new TimelineMax({paused:true});
-
-			self.turnPrev=function(){
-				if(!self.timeline.isActive()){
+			self.turnPage=function(pageIndex)
+		    {
+		    	console.log("turnPage",pageIndex);
+		    	if(!self.timeline.isActive()){
 					self.timeline.kill().clear();
-					//当前页面的往右移动
+					var  curPageData=self.pager.getCurrentPageData();
+					var  prevPageIndex=self.pager.getCurrentPage();
+				    var  nextPageData=self.pager.go(pageIndex).getCurrentPageData();
+				    var  nextPageIndex=self.pager.getCurrentPage();
+				    console.log(prevPageIndex,nextPageIndex);
+			    	self.transition("left",curPageData,nextPageData,prevPageIndex,nextPageIndex);
+			    }
+		    };
+		    self.turnNext=function(){
+		    	if(!self.timeline.isActive()){
+					self.timeline.kill().clear();
+					var  curPageData=self.pager.getCurrentPageData();
+					var  prevPageIndex=self.pager.getCurrentPage();
+					var  nextPageData=self.pager.next().getCurrentPageData();
+				    var  nextPageIndex=self.pager.getCurrentPage();
+				    console.log(prevPageIndex,nextPageIndex);
+				    self.transition("left",curPageData,nextPageData,prevPageIndex,nextPageIndex);
+				}
+		    };
+		    self.turnPrev=function(){
+		    	if(!self.timeline.isActive()){
+					self.timeline.kill().clear();
 				    var  curPageData=self.pager.getCurrentPageData();
-
-				    var  prevPageData=self.pager.prev().getCurrentPageData();
-				    
-				    for(var i=0;i<curPageData.length;i++){
+					var  prevPageIndex=self.pager.getCurrentPage();
+					var  nextPageData=self.pager.prev().getCurrentPageData();
+				    var  nextPageIndex=self.pager.getCurrentPage();
+				    console.log(prevPageIndex,nextPageIndex);
+				    self.transition("right",curPageData,nextPageData,prevPageIndex,nextPageIndex);
+				}
+		    };
+		    self.transition=function(direction,curPageData,nextPageData,prevPageIndex,nextPageIndex){
+		    	console.log(direction);
+		    	if(direction=="left")
+		    	{
+		    		//当前页移到最后面隐藏起来
+					for(var i=0;i<curPageData.length;i++){
 				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
 					            x:self.pager.pagesize+"00%"
 					    }), "0");
 				    };
-				    //前一页的移动到可视区域
-				    for(var i=0;i<prevPageData.length;i++){
-				    	TweenLite.set(prevPageData[i],{
+				    //下一页的移动到可视区域
+				    for(var i=0;i<nextPageData.length;i++){
+				    	TweenLite.set(nextPageData[i],{
 					            x:"-100%"
 					    });
-				    	self.timeline.add(TweenLite.to(prevPageData[i],self.speed, {
+				    	self.timeline.add(TweenLite.to(nextPageData[i],self.speed, {
 					            x:i+"00%"
 					    }), "0");
 				    };
-				    self.timeline.play();
-				    self.freshPager();
-				}
-			};
+		    	}
+		    	else if(direction=="right"){
+		    		//当前页移到最前面隐藏起来
+					for(var i=0;i<curPageData.length;i++){
+				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
+					            x: "-100%"
+					    }), "0");
+				    };
+				    //下一页的移动到可视区域
+				    for(var i=0;i<nextPageData.length;i++){
+				    	TweenLite.set(nextPageData[i],{
+					            x:self.pager.pagesize+"00%"
+					    });
+				    	self.timeline.add(TweenLite.to(nextPageData[i],self.speed, {
+					            x:i+"00%"
+					    }), "0");
+				    };
+		    	}
+			    self.timeline.add(TweenLite.set(self.dots.get(prevPageIndex-1), {
+				            className:"-=active"
+				}), "0");
+			    self.timeline.add(TweenLite.set(self.dots.get(nextPageIndex-1), {
+				            className:"+=active"
+				}), "0");
+			    self.timeline.play();
+			    self.freshPager();
+		    };
 			self.startAutorun=function()
 			{
 				window.clearInterval(self.autorunFn);
@@ -208,28 +302,6 @@
 			self.stopAutorun=function()
 			{
 				window.clearInterval(self.autorunFn);
-			};
-			self.turnNext=function(){
-				if(!self.timeline.isActive()){
-					self.timeline.kill().clear();
-				    var  curPageData=self.pager.getCurrentPageData();
-				    var  nextPageData=self.pager.next().getCurrentPageData();
-				    for(var i=0;i<curPageData.length;i++){
-				    	self.timeline.add(TweenLite.to(curPageData[i],self.speed, {
-					            x: "-100%"
-					    }), "0");
-				    };
-				    for(var i=0;i<nextPageData.length;i++){
-				    	TweenLite.set(nextPageData[i],{
-					            x:self.pager.pagesize+"00%"
-					    });
-				    	self.timeline.add(TweenLite.to(nextPageData[i],self.speed, {
-					            x:i+"00%"
-					    }), "0");
-				    };
-				    self.timeline.play();
-		  			self.freshPager();
-				}
 			};
 			self.resizeComponent=function()
 			{
@@ -296,11 +368,26 @@
 		  		self.qslideviewboxEle=target.find(".qslideviewbox");
 		  		self.prevEle=target.find(".prev");
 		  		self.nextEle=target.find(".next");
+		  		self.dotslistEle=target.find(".dotslist");
 		  		self.items=self.qslideviewboxEle.find(".item");
 		  		self.items.css("transform","translateX(-100%)");
-		  		
 		  		var pager=new Pager(self.items.toArray(),self.options.pagesize,self.options.infinite);
 		  		self.pager=pager;
+		  		self.pager.on("pageChange",function(e,val){
+		  			console.log("pageChange",val);
+		  			self.freshPager();
+		  		});
+		  		self.pager.on("totalPageChange",function(e,val){
+		  			console.log("totalPageChange",val);
+		  			self.dotslistEle.empty();
+		  			for(var i=0;i<val;i++)
+		  			{
+		  				var dot=$("<div>").addClass("dot");
+		  				self.dotslistEle.append(dot);
+		  			}
+		  			self.dots=self.dotslistEle.find(".dot");
+		  		});
+		  		self.pager.emit('totalPageChange',self.options.pagesize);
 
 		  		self.prevEle.on("click",function(){
 		  			self.turnPrev();
@@ -308,6 +395,9 @@
 		  		self.nextEle.on("click",function(){
 		  			self.turnNext();
 		  		});
+		  		self.dotslistEle.on("click",function(event){
+			      	self.turnPage(self.dots.get().indexOf(event.target)+1);
+			    });
 		  		if(self.options.autorun)
 		  		{
 		  			target.on("mouseenter",function(){
@@ -322,6 +412,7 @@
 		  			self.resizeComponent();
 				});
 		  		$(window).trigger("resize");
+
 
 		  	};
 
