@@ -23,6 +23,31 @@
 
 })(jQuery,'smartresize');
 
+(function(jQuery) {
+  jQuery.eventEmitter = {
+    _JQInit: function() {
+      this._JQ = jQuery(this);
+    },
+    emit: function(evt, data) {
+      !this._JQ && this._JQInit();
+      this._JQ.trigger(evt, data);
+    },
+    once: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.one(evt, handler);
+    },
+    on: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.bind(evt, handler);
+    },
+    off: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.unbind(evt, handler);
+    }
+  };
+}(jQuery));
+
+
 
 (function($){
 
@@ -77,10 +102,12 @@
 				if(self.currentPage>1)
 				{
 					self.currentPage--;
+					self.emit('change',self.currentPage);
 				}
 				else if(self.infinite && self.currentPage==1){
 					 //如果是最后一页,移动到最后
 					self.currentPage=self.totalPage;
+					self.emit('change',self.currentPage);
 				}
 				return self;
 			};
@@ -89,11 +116,13 @@
 				if(self.currentPage<self.totalPage)
 				{
 					 self.currentPage++;
+					 self.emit('change',self.currentPage);
 				}
 				else if(self.infinite && self.currentPage==self.totalPage)
 				{
 					 //如果是最后一页,移动到第一页
 					 self.currentPage=1;
+					 self.emit('change',self.currentPage);
 				}
 				return self;
 			};
@@ -106,6 +135,7 @@
 				if(self.havePage())
 				{
 					self.currentPage=1;
+					self.emit('change',self.currentPage);
 				}
 			};
 			self.goEnd=function()
@@ -113,6 +143,7 @@
 				if(self.havePage())
 				{
 					self.currentPage=self.totalPage;
+					self.emit('change',self.currentPage);
 				}
 			};
 			self.isEnd=function()
@@ -140,6 +171,7 @@
 					}
 					self.currentPage=page;
 				}
+				self.emit('change',self.currentPage);
 				return self;
 			};
 			self.setPageSize=function(pagesize)
@@ -160,7 +192,8 @@
 			self.init(data,pagesize);
 		};
 
-		
+		$.extend(Pager.prototype, $.eventEmitter);
+
 		function PluginObject(target) {
 			var self=this;
 			self.imgEles;
@@ -335,11 +368,11 @@
 		  		self.dots = target.find(".dot");
 		  		self.items=self.qslideviewboxEle.find(".item");
 		  		self.items.css("transform","translateX(-100%)");
-		  		
-
 		  		var pager=new Pager(self.items.toArray(),self.options.pagesize,self.options.infinite);
 		  		self.pager=pager;
-
+		  		self.pager.on("change",function(e,val){
+		  			console.log("page",val);
+		  		});
 		  		self.prevEle.on("click",function(){
 		  			self.turnPrev();
 		  		});
