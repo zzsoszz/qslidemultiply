@@ -22,11 +22,11 @@ img{
     text-align: center;
 }
 .qslidemultiply .prev{
-  width:79px;
-  height:140px;
   position:absolute;
   top:50%;
   left:0;
+  width:79px;
+  height:140px;
   transform: translate(-100%, -50%);
   background-image:url("images/prev.png");
   background-position:center;
