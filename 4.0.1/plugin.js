@@ -213,14 +213,12 @@
 			self.timeline = new TimelineMax({paused:true});
 			self.turnPage=function(pageIndex)
 		    {
-		    	console.log("turnPage",pageIndex);
 		    	if(!self.timeline.isActive()){
 					self.timeline.kill().clear();
 					var  curPageData=self.pager.getCurrentPageData();
 					var  prevPageIndex=self.pager.getCurrentPage();
 				    var  nextPageData=self.pager.go(pageIndex).getCurrentPageData();
 				    var  nextPageIndex=self.pager.getCurrentPage();
-				    console.log(prevPageIndex,nextPageIndex);
 				    var direction;
 				    if(prevPageIndex>nextPageIndex)
 				    {
@@ -385,11 +383,9 @@
 		  		var pager=new Pager(self.items.toArray(),self.options.pagesize,self.options.infinite);
 		  		self.pager=pager;
 		  		self.pager.on("pageChange",function(e,val){
-		  			console.log("pageChange",val);
 		  			self.freshPager();
 		  		});
 		  		self.pager.on("totalPageChange",function(e,val){
-		  			console.log("totalPageChange",val);
 		  			self.dotslistEle.empty();
 		  			for(var i=0;i<val;i++)
 		  			{

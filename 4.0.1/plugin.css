@@ -59,7 +59,7 @@ img {
 
 .qslidemultiply .dotsbox {
     position: absolute;
-    bottom: 10%;
+    bottom: 0%;
     width: 100%;
     text-align: center;
     z-index: 2;
