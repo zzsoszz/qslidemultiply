@@ -351,10 +351,10 @@
 			self.renderPager=function()
 			{
 				var matchedArray=$(self.options.responsive).filter(function(obj) {
-					if (self.viewport.width >=obj.breakpoint) {
+					if (self.viewport.width >=this.breakpoint) {
 						return true;
 					}
-				});
+				}).get();
 				if(matchedArray.length>0)
 				{
 					if(self.viewport.width  <= 600){
