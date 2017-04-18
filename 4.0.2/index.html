@@ -90,18 +90,24 @@ jQuery(window).ready(function() {
 		            loop:true
 		        },
 		        {
-		        	breakpoint:600,
-		            items:2,
+		        	breakpoint:{
+		        		min:600
+		        	},
+		            items:1,
 		            nav:false
 		        },
 		        {
-		        	breakpoint:900,
-		            items:3,
+		        	breakpoint:{
+		        		min:900
+		        	},
+		            items:1,
 		            nav:false
 		        },
 		        {
-		        	breakpoint:900,
-		            items:5,
+		        	breakpoint:{
+		        		min:1200
+		        	},
+		            items:1,
 		            nav:true,
 		            loop:false
 		        }

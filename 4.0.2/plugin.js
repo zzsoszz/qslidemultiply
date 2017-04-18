@@ -351,21 +351,22 @@
 			self.renderPager=function()
 			{
 				var matchedArray=$(self.options.responsive).filter(function(obj) {
-					if (self.viewport.width >=this.breakpoint) {
+					if(!this.breakpoint.min)
+					{
+						this.breakpoint.min=0;
+					}
+					if(!this.breakpoint.max)
+					{
+						this.breakpoint.max=999999999;
+					}
+					if (self.viewport.width >this.breakpoint.min && self.viewport.width <= this.breakpoint.max) {
 						return true;
 					}
 				}).get();
 				if(matchedArray.length>0)
 				{
-					if(self.viewport.width  <= 600){
-						self.pager.setPageSize(matchedArray.items);
-					}else if(self.viewport.width > 600 && self.viewport.width <= 900 ){
-						self.pager.setPageSize(2);
-					}else if(self.viewport.width > 900 && self.viewport.width <= 1200 ){
-						self.pager.setPageSize(3);
-					}else if(self.viewport.width > 1200){
-						self.pager.setPageSize(4);
-					}
+					var breakpoint=matchedArray[matchedArray.length-1];
+					self.pager.setPageSize(breakpoint.items);
 			  		var  curPageData=self.pager.getCurrentPageData();
 			  		for(var i=0;i<curPageData.length;i++)
 			  		{
