@@ -236,7 +236,7 @@
 					var  prevPageIndex=self.pager.getCurrentPage();
 					var  nextPageData=self.pager.next().getCurrentPageData();
 				    var  nextPageIndex=self.pager.getCurrentPage();
-				    console.log(prevPageIndex,nextPageIndex);
+				    //console.log(prevPageIndex,nextPageIndex);
 				    self.transition("left",curPageData,nextPageData,prevPageIndex,nextPageIndex);
 				}
 		    };
@@ -247,12 +247,12 @@
 					var  prevPageIndex=self.pager.getCurrentPage();
 					var  nextPageData=self.pager.prev().getCurrentPageData();
 				    var  nextPageIndex=self.pager.getCurrentPage();
-				    console.log(prevPageIndex,nextPageIndex);
+				    //console.log(prevPageIndex,nextPageIndex);
 				    self.transition("right",curPageData,nextPageData,prevPageIndex,nextPageIndex);
 				}
 		    };
 		    self.transition=function(direction,curPageData,nextPageData,prevPageIndex,nextPageIndex){
-		    	console.log(direction);
+		    	//console.log(direction);
 		    	if(direction=="right")
 		    	{
 		    		//当前页移到最后面隐藏起来
@@ -314,7 +314,7 @@
 					width:$(window).width(),
 					height:$(window).height()
 				};
-				console.log(self.viewport);
+				//console.log(self.viewport);
 				self.renderALL();
 			};
 			self.resetData=function(){
