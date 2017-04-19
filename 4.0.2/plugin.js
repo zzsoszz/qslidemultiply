@@ -299,10 +299,13 @@
 		    };
 			self.startAutorun=function()
 			{
-				window.clearInterval(self.autorunFn);
-				self.autorunFn=setInterval(function(){
-		  			self.turnNext();
-		  		},1000);
+				if(self.pager.getPageSize()>1)
+				{
+					window.clearInterval(self.autorunFn);
+					self.autorunFn=setInterval(function(){
+			  			self.turnNext();
+			  		},1000);
+				}
 			};
 			self.stopAutorun=function()
 			{
