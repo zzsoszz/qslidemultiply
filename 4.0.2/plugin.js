@@ -207,7 +207,6 @@
 			self.prevEle;
 			self.speed=1;
 			self.pager;
-			self.infinite;
 			self.autorunFn;
 			self.qslideviewboxEle;
 			self.items;
@@ -219,6 +218,7 @@
 		    {
 		    	if(!self.timeline.isActive()){
 					self.timeline.kill().clear();
+
 					var  curPageData=self.pager.getCurrentPageData();
 					var  prevPageIndex=self.pager.getCurrentPage();
 				    var  nextPageData=self.pager.go(pageIndex).getCurrentPageData();
@@ -238,6 +238,10 @@
 				{
 			    	if(!self.timeline.isActive()){
 						self.timeline.kill().clear();
+						if(!self.options.infinite && self.pager.isEnd())
+						{
+							return;
+						}
 						var  curPageData=self.pager.getCurrentPageData();
 						var  prevPageIndex=self.pager.getCurrentPage();
 						var  nextPageData=self.pager.next().getCurrentPageData();
@@ -250,6 +254,10 @@
 		    self.turnPrev=function(){
 		    	if(!self.timeline.isActive()){
 					self.timeline.kill().clear();
+					if(!self.options.infinite && self.pager.isHead())
+					{
+						return;
+					}
 				    var  curPageData=self.pager.getCurrentPageData();
 					var  prevPageIndex=self.pager.getCurrentPage();
 					var  nextPageData=self.pager.prev().getCurrentPageData();
@@ -340,7 +348,7 @@
 					self.nextEle.addClass("disable");
 					return;
 				}
-				if(!self.infinite)
+				if(!self.options.infinite)
 				{
 					if(self.pager.isHead())
 					{
