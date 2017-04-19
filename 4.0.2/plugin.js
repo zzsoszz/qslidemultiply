@@ -179,6 +179,10 @@
 				self.init(self.data,pagesize);
 				self.emit('totalPageChange',self.totalPage);
 			};
+			self.getTotalPage=function()
+			{
+				return self.totalPage;
+			};
 			self.getPageSize=function()
 			{
 				return self.pagesize;
@@ -230,14 +234,17 @@
 			    }
 		    };
 		    self.turnNext=function(){
-		    	if(!self.timeline.isActive()){
-					self.timeline.kill().clear();
-					var  curPageData=self.pager.getCurrentPageData();
-					var  prevPageIndex=self.pager.getCurrentPage();
-					var  nextPageData=self.pager.next().getCurrentPageData();
-				    var  nextPageIndex=self.pager.getCurrentPage();
-				    //console.log(prevPageIndex,nextPageIndex);
-				    self.transition("left",curPageData,nextPageData,prevPageIndex,nextPageIndex);
+		    	if(self.pager.getTotalPage()>1)
+				{
+			    	if(!self.timeline.isActive()){
+						self.timeline.kill().clear();
+						var  curPageData=self.pager.getCurrentPageData();
+						var  prevPageIndex=self.pager.getCurrentPage();
+						var  nextPageData=self.pager.next().getCurrentPageData();
+					    var  nextPageIndex=self.pager.getCurrentPage();
+					    //console.log(prevPageIndex,nextPageIndex);
+					    self.transition("left",curPageData,nextPageData,prevPageIndex,nextPageIndex);
+					}
 				}
 		    };
 		    self.turnPrev=function(){
@@ -247,12 +254,12 @@
 					var  prevPageIndex=self.pager.getCurrentPage();
 					var  nextPageData=self.pager.prev().getCurrentPageData();
 				    var  nextPageIndex=self.pager.getCurrentPage();
-				    //console.log(prevPageIndex,nextPageIndex);
+				    console.log(prevPageIndex,nextPageIndex);
 				    self.transition("right",curPageData,nextPageData,prevPageIndex,nextPageIndex);
 				}
 		    };
 		    self.transition=function(direction,curPageData,nextPageData,prevPageIndex,nextPageIndex){
-		    	//console.log(direction);
+		    	console.log(direction);
 		    	if(direction=="right")
 		    	{
 		    		//当前页移到最后面隐藏起来
@@ -299,13 +306,10 @@
 		    };
 			self.startAutorun=function()
 			{
-				if(self.pager.getPageSize()>1)
-				{
-					window.clearInterval(self.autorunFn);
-					self.autorunFn=setInterval(function(){
-			  			self.turnNext();
-			  		},1000);
-				}
+				window.clearInterval(self.autorunFn);
+				self.autorunFn=setInterval(function(){
+		  			self.turnNext();
+		  		},1000);
 			};
 			self.stopAutorun=function()
 			{
@@ -317,7 +321,7 @@
 					width:$(window).width(),
 					height:$(window).height()
 				};
-				//console.log(self.viewport);
+				console.log(self.viewport);
 				self.renderALL();
 			};
 			self.resetData=function(){
